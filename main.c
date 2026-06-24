@@ -1,7 +1,7 @@
 #include "led_driver.h"
 #include <util/delay.h>
 
-#define F_CLK 16000000UL
+#define F_CPU 16000000UL
 
 void main(void)
 {
