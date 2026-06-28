@@ -47,9 +47,11 @@
 
 #include <stdint.h>
 
-#define	CRC_ERR 0x00
+#define	CRC_INIT 	0xff
+#define	CRC_POLY	0x31
+#define	CRC_ERR 	0xcc
 
-void	sht31_init(void);
-void	sht31_read_data(void);
-uint8_t	sht31_verif_crc(uint8_t	crc);
+int8_t	sht31_init(void);
+int8_t	sht31_read_data(void);
+uint8_t	sht31_verif_crc(uint8_t	data_msb, uint8_t	data_lsb);
 void	sht31_convert(uint16_t temp, uint16_t humidity);
