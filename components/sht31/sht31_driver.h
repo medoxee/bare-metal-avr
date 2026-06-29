@@ -39,10 +39,12 @@
  *
  * Functions	:
  * 	sht31_init	: Initilize sensor and prepare it for measurement.
- * 	sht31_read_data	: Read Temp/Humidity data.
+ * 	sht31_measure	: Start measuring Temp & Humidity.
+ * 	sht31_read_data	: Read Temp & Humidity data.
  */
 
 #include <stdint.h>
 
 uint8_t	sht31_init(void);
+uint8_t	sht31_measure(void);
 uint8_t	sht31_read_data(int16_t	*temp_hum);

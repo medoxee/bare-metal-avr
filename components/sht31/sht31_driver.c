@@ -77,11 +77,9 @@ uint8_t	sht31_init(void)
 	/* 
 	 * set bit rate to 0x48 (calculated from formula of sensor manifacturer)
 	 * set prescaller to 0b00.
-	 * set & send START condition.
+	 * send START condition.
 	 * wait until it is sent.
-	 * reset TWSTA and check if START is transmitted.
-	 * if not, flag an error.
-	 * create i2c addr + W bit then send it, then check ACK.
+	 * check if START sent, if not, flag error.
 	 */
 	TWBR = 0x48;
 	TWSR &= 0xfc;
@@ -89,6 +87,12 @@ uint8_t	sht31_init(void)
 	if (TW_STATUS != TW_START)
 		return	0x01;
 	TWCR &= ~(1 << TWSTA);
+	return 0;
+}
+
+uint8_t	sht31_measure(void)
+{
+
 	TWDR = (SHT_ADDR << 1) | WBIT;
 	if (sht31_interrupt_handler(TW_MT_SLA_ACK))
 		return 0x02;
@@ -100,7 +104,7 @@ uint8_t	sht31_init(void)
 		return 0x04;
 	sht31_send_condition(TWSTO);
 	_delay_ms(8);
-	return 0;
+	return	0;
 }
 
 uint8_t	sht31_read_data(int16_t	*temp_hum)
