@@ -35,7 +35,7 @@
  * # Data processing:
  * 	1- Calculate the CRC Checksum to verify data.
  * 	2- Convert raw data into a physical scale (T: °C, H: %) by using
- * 	the mathematic formula from sensor manifacuterer (Sensirion).
+ * 	the mathematical formula from sensor manifacuterer (Sensirion).
  *
  * Functions	:
  * 	sht31_init	: Initilize sensor and prepare it for measurement.
@@ -47,11 +47,8 @@
 
 #include <stdint.h>
 
-#define	CRC_INIT 	0xff
-#define	CRC_POLY	0x31
-#define	CRC_ERR 	0xcc
-
-int8_t	sht31_init(void);
-int8_t	sht31_read_data(void);
+uint8_t	sht31_init(void);
+uint8_t	sht31_read_data(void);
 uint8_t	sht31_verif_crc(uint8_t	data_msb, uint8_t	data_lsb);
-void	sht31_convert(uint16_t temp, uint16_t humidity);
+uint16_t	*sht31_convert(uint16_t	temp_msb, uint16_t	temp_lsb,
+		uint16_t	hum_msb, uint16_t	hum_lsb);
