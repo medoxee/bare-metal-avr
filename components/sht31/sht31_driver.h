@@ -48,7 +48,8 @@
 #include <stdint.h>
 
 uint8_t	sht31_init(void);
-uint8_t	sht31_read_data(void);
+uint8_t	sht31_read_data(int16_t	*scaled_data);
 uint8_t	sht31_verif_crc(uint8_t	data_msb, uint8_t	data_lsb);
-uint16_t	*sht31_convert(uint16_t	temp_msb, uint16_t	temp_lsb,
-		uint16_t	hum_msb, uint16_t	hum_lsb);
+void	*sht31_convert(int16_t	scaled_data, uint16_t	temp_msb,
+		uint16_t	temp_lsb, uint16_t	hum_msb,
+		uint16_t	hum_lsb);
