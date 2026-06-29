@@ -40,16 +40,9 @@
  * Functions	:
  * 	sht31_init	: Initilize sensor and prepare it for measurement.
  * 	sht31_read_data	: Read Temp/Humidity data.
- * 	sht31_verif_crc	: Verify CRC Checksum, if not equal to CRC, return
- * 			error flag CRC_ERR.
- * 	sht31_convert	: Converts raw data to pysical scale data.
  */
 
 #include <stdint.h>
 
 uint8_t	sht31_init(void);
 uint8_t	sht31_read_data(int16_t	*scaled_data);
-uint8_t	sht31_verif_crc(uint8_t	data_msb, uint8_t	data_lsb);
-void	sht31_convert(int16_t	*scaled_data, uint16_t	temp_msb,
-		uint16_t	temp_lsb, uint16_t	hum_msb,
-		uint16_t	hum_lsb);
