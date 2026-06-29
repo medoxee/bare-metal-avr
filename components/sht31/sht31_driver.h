@@ -2,7 +2,7 @@
  * 				IN THE NAME OF ALLAH,
  * History	: 26-06-2026
  * Author	: MOHAMED ARRAF -- (www.linkedin.com/in/mohamedarraf).
- * Purpose	: Controlling sht31 sensor.
+ * Purpose	: Driver for Sensirion SHT31 sensor.
  * Algorithm	:
  *
  *  # Setting:
