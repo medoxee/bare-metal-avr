@@ -58,18 +58,17 @@ static	uint8_t	sht31_verif_crc(uint8_t	data_msb, uint8_t	data_lsb)
 
 static	uint8_t	sht31_interrupt_handler(uint8_t	status_code)
 {
-	TWCR |= (1 << TWINT) | (1 << TWEN);
+	TWCR = (1 << TWINT) | (1 << TWEN);
 	while (!(TWCR & (1 << TWINT)));
 	if (TW_STATUS != status_code)
 		return 1;
 	return 0;
 }
 
-static	void	sht31_send_condition(uint8_t	condition)
+static	void	sht31_send_start(void)
 {	
-	TWCR = (1 << condition) | (1 << TWINT) | (1 << TWEN);
-	if (condition != TWSTO)
-		while (!(TWCR & (1 << TWINT)));
+	TWCR = (1 << TWSTA) | (1 << TWINT) | (1 << TWEN);
+	while (!(TWCR & (1 << TWINT)));
 }
 
 uint8_t	sht31_init(void)
@@ -77,22 +76,18 @@ uint8_t	sht31_init(void)
 	/* 
 	 * set bit rate to 0x48 (calculated from formula of sensor manifacturer)
 	 * set prescaller to 0b00.
-	 * send START condition.
-	 * wait until it is sent.
-	 * check if START sent, if not, flag error.
 	 */
 	TWBR = 0x48;
 	TWSR &= 0xfc;
-	sht31_send_condition(TWSTA);
-	if (TW_STATUS != TW_START)
-		return	0x01;
-	TWCR &= ~(1 << TWSTA);
+
 	return 0;
 }
 
 uint8_t	sht31_measure(void)
 {
-
+	sht31_send_start();
+	if (TW_STATUS != TW_START)
+		return	0x01;
 	TWDR = (SHT_ADDR << 1) | WBIT;
 	if (sht31_interrupt_handler(TW_MT_SLA_ACK))
 		return 0x02;
@@ -102,7 +97,7 @@ uint8_t	sht31_measure(void)
 	TWDR = CMD_LSB;
 	if (sht31_interrupt_handler(TW_MT_DATA_ACK))
 		return 0x04;
-	sht31_send_condition(TWSTO);
+	TWCR = (1 << TWSTO) | (1 << TWINT) | (1 << TWEN);
 	_delay_ms(8);
 	return	0;
 }
@@ -112,20 +107,19 @@ uint8_t	sht31_read_data(int16_t	*temp_hum)
 	uint8_t	raw_data[DATA_SIZE];
 	uint8_t	byte_counter;
 
-	sht31_send_condition(TWSTA);
+	sht31_send_start();
 	if (TW_STATUS != TW_START)
 		return	0x05;
-	TWCR &= ~(1 << TWSTA);
 	TWDR = (SHT_ADDR << 1) | RBIT;
 	if (sht31_interrupt_handler(TW_MR_SLA_ACK))
 		return	0x06;
 	byte_counter = 0;
-	TWCR |= (1 << TWEA);
+	TWCR |= (1 << TWEA); /* Check this line, it might causing a bug */
 	while  (1)
 	{
 		if (byte_counter == 5)
 		{
-			TWCR &= ~(1 << TWEA);
+			TWCR &= ~(1 << TWEA); /* Check this line */
 			if (sht31_interrupt_handler(TW_MR_DATA_NACK))
 				return	0x07;
 			raw_data[byte_counter] = TWDR;
@@ -136,7 +130,7 @@ uint8_t	sht31_read_data(int16_t	*temp_hum)
 		raw_data[byte_counter] = TWDR;
 		byte_counter++;
 	}
-	sht31_send_condition(TWSTO);
+	TWCR = (1 << TWSTO) | (1 << TWINT) | (1 << TWEN);
 	if (sht31_verif_crc(raw_data[0], raw_data[1]) != raw_data[2])
 		return	0x09;
 	if (sht31_verif_crc(raw_data[3], raw_data[4]) != raw_data[5])
